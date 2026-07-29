@@ -6,6 +6,7 @@ export interface NodeMetrics {
   ping: number;
   bandWithUp: number;
   bandWithDown: number;
+  uptime: string;
 }
 
 export interface ServerNode {
