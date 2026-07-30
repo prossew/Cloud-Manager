@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNodeStore, MOCK_NODES, NodeCard } from "./entities/node";
+import { NetworkGraph } from "./widgets/network-graph";
 
 export default function App() {
   const nodes = useNodeStore((state) => state.nodes);
@@ -25,10 +26,18 @@ export default function App() {
           </div>
         </header>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {nodes.map((node) => (
-            <NodeCard key={node.id} node={node} onManage={handlManage} />
-          ))}
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">Топология сети</h2>
+          <NetworkGraph />
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">Список серверов</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {nodes.map((node) => (
+              <NodeCard key={node.id} node={node} onManage={handlManage} />
+            ))}
+          </div>
         </section>
       </div>
     </main>
