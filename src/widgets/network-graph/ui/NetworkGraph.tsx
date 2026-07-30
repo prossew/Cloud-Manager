@@ -19,9 +19,11 @@ export const NetworkGraph = () => {
       data: {
         label: (
           <div className="p-2 text-left font-mono">
-            <div className="font-bold text-sm">{node.name}</div>
+            <div className="font-bold text-sm text-foreground">{node.name}</div>
             <div className="text-xs text-muted-foreground">{node.ip}</div>
-            <div className="{`text-[10px] mt-1 font-semibold ${node.status === 'online' ? 'text-emerald-500' : 'text-rose-500'}`}">
+            <div
+              className={`text-[10px] mt-1 font-semibold ${node.status === "online" ? "text-emerald-500" : "text-rose-500"}`}
+            >
               ● {node.status.toUpperCase()}
             </div>
           </div>
