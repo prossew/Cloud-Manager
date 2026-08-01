@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNodeStore, MOCK_NODES, NodeCard } from "./entities/node";
 import { NetworkGraph } from "./widgets/network-graph";
+import { MetricsChart } from "./widgets/metrics-chart";
 
 export default function App() {
   const nodes = useNodeStore((state) => state.nodes);
@@ -29,6 +30,10 @@ export default function App() {
         <section className="space-y-3">
           <h2 className="text-lg font-semibold">Топология сети</h2>
           <NetworkGraph />
+        </section>
+
+        <section className="space-y-3">
+          <MetricsChart />
         </section>
 
         <section className="space-y-3">

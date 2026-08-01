@@ -1,0 +1,1 @@
+export { MetricsChart } from "@/widgets/metrics-chart/ui/MetricsChart";
