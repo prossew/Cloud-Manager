@@ -1,18 +1,27 @@
-import { useEffect } from "react";
-import { useNodeStore, MOCK_NODES, NodeCard } from "./entities/node";
+import { useEffect, useState } from "react";
+import {
+  useNodeStore,
+  MOCK_NODES,
+  NodeCard,
+  type ServerNode,
+} from "./entities/node";
 import { NetworkGraph } from "./widgets/network-graph";
 import { MetricsChart } from "./widgets/metrics-chart";
+import { ManageNodeModal } from "./features/manage-node";
 
 export default function App() {
   const nodes = useNodeStore((state) => state.nodes);
   const setNodes = useNodeStore((state) => state.setNodes);
+
+  const [managingNode, setManagingNode] = useState<ServerNode | null>(null);
 
   useEffect(() => {
     setNodes(MOCK_NODES);
   }, [setNodes]);
 
   const handlManage = (id: string) => {
-    console.log("Кликнул на управление сервером", id);
+    const node = nodes.find((n) => n.id === id) || null;
+    setManagingNode(node);
   };
 
   return (
@@ -20,7 +29,14 @@ export default function App() {
       <div className="max-w-7xl mx-auto space-y-6">
         <header className="flex items-center justify-between border-b pb-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Cloud Manager</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              <img
+                src="/favicon.png"
+                alt="Favicon"
+                className="inline-block w-13 h-8 mr-1 "
+              />
+              Cloud Manager
+            </h1>
             <p className="text-sm text-muted-foreground">
               Мониторинг и управление инфраструктурой
             </p>
@@ -44,6 +60,12 @@ export default function App() {
             ))}
           </div>
         </section>
+
+        <ManageNodeModal
+          node={managingNode}
+          isOpen={!!managingNode}
+          onClose={() => setManagingNode(null)}
+        />
       </div>
     </main>
   );
