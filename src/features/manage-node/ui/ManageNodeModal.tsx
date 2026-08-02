@@ -24,7 +24,7 @@ export const ManageNodeModal = ({
 }: ManageNodeModalProps) => {
   const [copied, setCopied] = useState(false);
   if (!node) return null;
-  const sshCommand = `ssh user@${node.ip}`;
+  const sshCommand = `ssh root@${node.ip}`;
 
   const handleCopySsh = () => {
     navigator.clipboard.writeText(sshCommand);

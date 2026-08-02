@@ -33,7 +33,7 @@ export default function App() {
               <img
                 src="/favicon.png"
                 alt="Favicon"
-                className="inline-block w-13 h-8 mr-1 "
+                className="inline-block w-8 h-8 mr-1 "
               />
               Cloud Manager
             </h1>
