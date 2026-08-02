@@ -62,7 +62,7 @@ export const NetworkGraph = () => {
     <div className="w-full h-[400px] border rounded-xl overflow-hidden bg-card shadow-sm relative">
       <ReactFlow nodes={flowNodes} edges={flowEdges} fitView>
         <Background gap={16} size={1} />
-        <Controls />
+        <Controls className="[&>button]:!bg-card [&>button]:!border-border [&>button]:!fill-foreground hover:[&>button]:!bg-accent" />
       </ReactFlow>
     </div>
   );

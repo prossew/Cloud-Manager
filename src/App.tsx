@@ -5,16 +5,20 @@ import {
   NodeCard,
   type ServerNode,
 } from "./entities/node";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { NetworkGraph } from "./widgets/network-graph";
 import { MetricsChart } from "./widgets/metrics-chart";
 import { ManageNodeModal } from "./features/manage-node";
 import { ThemeToggle } from "./features/theme-toggle";
+import { AddNodeModal } from "./features/add-node";
 
 export default function App() {
   const nodes = useNodeStore((state) => state.nodes);
   const setNodes = useNodeStore((state) => state.setNodes);
 
   const [managingNode, setManagingNode] = useState<ServerNode | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     setNodes(MOCK_NODES);
@@ -42,7 +46,12 @@ export default function App() {
               Мониторинг и управление инфраструктурой
             </p>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <Button onClick={() => setIsAddModalOpen(true)} className="gap-2">
+              <Plus className="w-4 h-4" /> Добавить сервер
+            </Button>
+            <ThemeToggle />
+          </div>
         </header>
 
         <section className="space-y-3">
@@ -67,6 +76,10 @@ export default function App() {
           node={managingNode}
           isOpen={!!managingNode}
           onClose={() => setManagingNode(null)}
+        />
+        <AddNodeModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
         />
       </div>
     </main>

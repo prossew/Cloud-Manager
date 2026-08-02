@@ -3,10 +3,11 @@ export type NodeStatus = "online" | "offline" | "maintenance";
 export interface NodeMetrics {
   cpuUsage: number;
   ramUsage: number;
-  ping: number;
-  bandWithUp: number;
-  bandWithDown: number;
+  ping?: number;
+  bandWithUp?: number;
+  bandWithDown?: number;
   uptime: string;
+  diskUsage: number;
 }
 
 export interface ServerNode {

@@ -4,6 +4,7 @@ import type { ServerNode, NodeMetrics } from "./type";
 interface NodeState {
   nodes: ServerNode[];
   selectedNodeId: string | null;
+  addNode: (node: ServerNode) => void;
 
   setNodes: (nodes: ServerNode[]) => void;
   selectNode: (id: string | null) => void;
@@ -17,6 +18,11 @@ export const useNodeStore = create<NodeState>((set) => ({
   setNodes: (nodes) => set({ nodes }),
 
   selectNode: (id) => set({ selectedNodeId: id }),
+
+  addNode: (newNode) =>
+    set((state) => ({
+      nodes: [...state.nodes, newNode],
+    })),
 
   updateNodeMetrics: (id, metrics) =>
     set((state) => ({
