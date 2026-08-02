@@ -8,6 +8,7 @@ import {
 import { NetworkGraph } from "./widgets/network-graph";
 import { MetricsChart } from "./widgets/metrics-chart";
 import { ManageNodeModal } from "./features/manage-node";
+import { ThemeToggle } from "./features/theme-toggle";
 
 export default function App() {
   const nodes = useNodeStore((state) => state.nodes);
@@ -41,6 +42,7 @@ export default function App() {
               Мониторинг и управление инфраструктурой
             </p>
           </div>
+          <ThemeToggle />
         </header>
 
         <section className="space-y-3">
