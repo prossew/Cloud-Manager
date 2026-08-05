@@ -1,10 +1,5 @@
-import { useEffect, useState, useMemo } from "react"; // 👈 Добавлен useMemo
-import {
-  useNodeStore,
-  MOCK_NODES,
-  NodeCard,
-  type ServerNode,
-} from "./entities/node";
+import { useEffect, useState, useMemo } from "react";
+import { useNodeStore, NodeCard, type ServerNode } from "./entities/node";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NetworkGraph } from "./widgets/network-graph";
@@ -16,7 +11,8 @@ import { NodeFilter, type StatusFilter } from "./features/node-filter";
 
 export default function App() {
   const nodes = useNodeStore((state) => state.nodes);
-  const setNodes = useNodeStore((state) => state.setNodes);
+  const fetchNodes = useNodeStore((state) => state.fetchNodes);
+  const connectWebSocket = useNodeStore((state) => state.connectWebSocket);
 
   const [managingNode, setManagingNode] = useState<ServerNode | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -25,8 +21,15 @@ export default function App() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   useEffect(() => {
-    setNodes(MOCK_NODES);
-  }, [setNodes]);
+
+    fetchNodes();
+
+    const cleanupWS = connectWebSocket();
+
+    return () => {
+      cleanupWS();
+    };
+  }, [fetchNodes, connectWebSocket]);
 
   const handlManage = (id: string) => {
     const node = nodes.find((n) => n.id === id) || null;
