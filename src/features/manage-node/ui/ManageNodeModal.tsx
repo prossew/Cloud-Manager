@@ -9,7 +9,10 @@ import {
 import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import type { ServerNode } from "@/entities/node";
-import { Terminal, RefreshCw, Power, Copy, Check } from "lucide-react";
+
+import { RefreshCw, Power, Copy, Check } from "lucide-react";
+
+import { Terminal } from "./Terminal";
 
 interface ManageNodeModalProps {
   node: ServerNode | null;
@@ -37,7 +40,6 @@ export const ManageNodeModal = ({
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {" "}
             <span>Управление {node.name}</span>
           </DialogTitle>
           <DialogDescription className="font-mono text-xs">
@@ -48,13 +50,12 @@ export const ManageNodeModal = ({
         <Tabs defaultValue="actions" className="w-full mt-2">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="actions">Быстрые действия</TabsTrigger>
-            <TabsTrigger value="logs">Логи сервера</TabsTrigger>
+            <TabsTrigger value="logs">SSH Терминал</TabsTrigger>
           </TabsList>
 
           <TabsContent value="actions" className="space-y-4 pt-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">
-                {" "}
                 Подключение по SSH
               </label>
               <div className="flex items-center gap-2 bg-muted p-2 rounded-lg font-mono text-xs">
@@ -94,26 +95,7 @@ export const ManageNodeModal = ({
           </TabsContent>
 
           <TabsContent value="logs" className="pt-4">
-            <div className="bg-slate-950 text-slate-50 font-mono text-xs p-3 rounded-lg h-[200px] overflow-y-auto space-y-1">
-              <div className="flex items-center gap-1.5 text-slate-400 border-b border-slate-800 pb-1 mb-2">
-                <Terminal className="w-3.5 h-3.5" /> System Output
-              </div>
-              <p className="text-emerald-400">[OK] System initialized.</p>
-              <p className="text-slate-400">
-                [INFO] WireGuard tunnel active on port 51820.
-              </p>
-              <p className="text-slate-400">
-                [INFO] CPU Usage: {node.metrics.cpuUsage}%
-              </p>
-              <p className="text-slate-400">
-                [INFO] RAM Usage: {node.metrics.ramUsage}%
-              </p>
-              {node.status === "offline" && (
-                <p className="text-rose-400">
-                  [WARN] Connection lost! Retrying heartbeat...
-                </p>
-              )}
-            </div>
+            <Terminal node={node} />
           </TabsContent>
         </Tabs>
       </DialogContent>
