@@ -10,15 +10,6 @@ import {
 } from "recharts";
 import { useNodeStore } from "@/entities/node";
 
-const MOCK_HISTORY_DATA = [
-  { time: "12:00", cpu: 20, ram: 46, network: 12 },
-  { time: "12:12", cpu: 35, ram: 50, network: 45 },
-  { time: "12:20", cpu: 21, ram: 38, network: 23 },
-  { time: "12:30", cpu: 44, ram: 49, network: 56 },
-  { time: "12:35", cpu: 56, ram: 56, network: 34 },
-  { time: "12:41", cpu: 88, ram: 80, network: 45 },
-  { time: "12:55", cpu: 11, ram: 32, network: 64 },
-];
 export const MetricsChart = () => {
   const nodes = useNodeStore((state) => state.nodes);
   const selectedNodeId = useNodeStore((state) => state.selectedNodeId);
@@ -27,7 +18,16 @@ export const MetricsChart = () => {
   const [activeMetric, setActiveMetric] = useState<"cpu" | "ram" | "network">(
     "cpu",
   );
-  const activeNode = nodes.find((n) => n.id === selectedNodeId || nodes[0]);
+  const activeNode = selectedNodeId
+    ? nodes.find((node) => node.id === selectedNodeId)
+    : nodes[0];
+  const chartData = nodes.map((node) => ({
+    name: node.name,
+    cpu: node.metrics.cpuUsage,
+    ram: node.metrics.ramUsage,
+    network: node.metrics.networkSpeed,
+  }));
+  const metricUnit = activeMetric === "network" ? " Mbps" : "%";
   return (
     <div className="w-full border rounded-xl bg-card p-6 shadow-sm space-y-4">
       <div className="flex flex-col sm:flex-row sm: items-center justify-between gap-4 border-b pb-4">
@@ -75,9 +75,9 @@ export const MetricsChart = () => {
         </div>
       </div>
 
-      <div className="h-[260px] w-full pt-2">
+      <div className="h-65 w-full pt-2">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={MOCK_HISTORY_DATA}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
@@ -86,12 +86,17 @@ export const MetricsChart = () => {
             </defs>
             <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
             <XAxis
-              dataKey="time"
+              dataKey="name"
               stroke="#888888"
               fontSize={12}
               tickLine={false}
             />
-            <YAxis stroke="#888888" fontSize={12} tickLine={false} unit="%" />
+            <YAxis
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              unit={metricUnit}
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: "var(--card)",

@@ -14,21 +14,17 @@ interface TerminalProps {
 
 export const Terminal = ({ node }: TerminalProps) => {
   const [input, setInput] = useState("");
-  const [logs, setLogs] = useState<CommandLog[]>([
+  const [isLoading, setIsLoading] = useState(false);
+  const [logs, setLogs] = useState([
     {
       id: "init-1",
       type: "info",
-      text: `Connecting to ${node.name} (${node.ip}) via SSH port 22...`,
+      text: `Connected to ${node.name} ${node.ip} as root.`,
     },
     {
       id: "init-2",
       type: "info",
-      text: `Connected. Welcome to ${node.provider} Linux OS (x86_64).`,
-    },
-    {
-      id: "init-3",
-      type: "info",
-      text: 'Type "help" to view available Cloud Manager commands.',
+      text: "Type any Linux command (e.g. 'uptime', 'uname -a', 'free -h', 'docker ps').",
     },
   ]);
 
@@ -38,10 +34,16 @@ export const Terminal = ({ node }: TerminalProps) => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
 
-  const handleCommand = (e: React.FormEvent) => {
+  const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();
     const cmd = input.trim();
-    if (!cmd) return;
+    if (!cmd || isLoading) return;
+
+    if (cmd.toLowerCase() === "clear") {
+      setLogs([]);
+      setInput("");
+      return;
+    }
 
     const userLog: CommandLog = {
       id: Date.now().toString(),
@@ -49,87 +51,46 @@ export const Terminal = ({ node }: TerminalProps) => {
       text: cmd,
     };
 
-    const newLogs = [...logs, userLog];
-    const cleanCmd = cmd.toLowerCase();
+    setLogs((prev) => [...prev, userLog]);
+    setInput("");
+    setIsLoading(true);
 
-    if (cleanCmd === "clear") {
-      setLogs([]);
-      setInput("");
-      return;
-    }
+    try {
+      const response = await fetch(
+        `http://localhost:3001/api/nodes/${node.id}/exec`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ command: cmd }),
+        },
+      );
 
-    let responseLog: CommandLog;
+      const data = await response.json();
 
-    switch (cleanCmd) {
-      case "help":
-        responseLog = {
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to execute command");
+      }
+
+      setLogs((prev) => [
+        ...prev,
+        {
           id: (Date.now() + 1).toString(),
           type: "output",
-          text: `Available commands:
-  help      - Show this help message
-  status    - Display current node system status
-  top       - Show real-time CPU & RAM usage
-  ping      - Ping server IP (${node.ip})
-  clear     - Clear terminal screen
-  restart   - Trigger soft reboot simulation`,
-        };
-        break;
-
-      case "status":
-        responseLog = {
-          id: (Date.now() + 1).toString(),
-          type: "output",
-          text: `[SYSTEM STATUS]
-  Node Name:  ${node.name}
-  IP Address: ${node.ip}
-  Provider:   ${node.provider}
-  Location:   ${node.location}
-  State:      ${node.status.toUpperCase()}`,
-        };
-        break;
-
-      case "top":
-        responseLog = {
-          id: (Date.now() + 1).toString(),
-          type: "output",
-          text: `[TOP PROCESSES]
-  CPU Load:  ${node.metrics?.cpuUsage ?? 0}%
-  RAM Usage: ${node.metrics?.ramUsage ?? 0}%
-  Disk:      ${node.metrics?.diskUsage ?? 0}%
-  Network:   ${node.metrics?.networkSpeed ?? 0} MB/s`,
-        };
-        break;
-
-      case "ping":
-        responseLog = {
-          id: (Date.now() + 1).toString(),
-          type: "output",
-          text: `PING ${node.ip} 56(84) bytes of data.
-64 bytes from ${node.ip}: icmp_seq=1 ttl=54 time=14.2 ms
-64 bytes from ${node.ip}: icmp_seq=2 ttl=54 time=13.8 ms
---- ${node.ip} ping statistics ---
-2 packets transmitted, 2 received, 0% packet loss`,
-        };
-        break;
-
-      case "restart":
-        responseLog = {
-          id: (Date.now() + 1).toString(),
-          type: "info",
-          text: `Initiating system reboot on ${node.name}... OK. Services restarted.`,
-        };
-        break;
-
-      default:
-        responseLog = {
+          text: data.output || "(no output)",
+        },
+      ]);
+    } catch (err) {
+      setLogs((prev) => [
+        ...prev,
+        {
           id: (Date.now() + 1).toString(),
           type: "error",
-          text: `zsh: command not found: ${cmd}. Type "help" for a list of commands.`,
-        };
+          text: (err as Error).message,
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
     }
-
-    setLogs([...newLogs, responseLog]);
-    setInput("");
   };
 
   return (

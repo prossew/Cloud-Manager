@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { Server } from "node:http";
-import { updateRandomMetrics } from "./store.js";
+import { updateLiveMetrics } from "./store.js";
 
 export const initWebSocket = (server: Server) => {
   const wss = new WebSocketServer({ server });
@@ -13,8 +13,8 @@ export const initWebSocket = (server: Server) => {
     });
   });
 
-  setInterval(() => {
-    const updatedNodes = updateRandomMetrics();
+  setInterval(async () => {
+    const updatedNodes = await updateLiveMetrics();
     const payload = JSON.stringify({
       type: "METRICS_UPDATE",
       payload: updatedNodes,

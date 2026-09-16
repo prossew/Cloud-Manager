@@ -8,7 +8,8 @@ const server = createServer(handleHttpRequest);
 
 initWebSocket(server);
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(` сервер запущен: http://localhost:${PORT}`);
   console.log(` websocket подключен: ws://localhost:${PORT}`);
 });
+
